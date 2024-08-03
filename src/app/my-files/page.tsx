@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
-import { upload } from './actions';
+import { upload, remove } from './actions';
 import Download from './download';
 
 
@@ -21,6 +21,7 @@ export default async function MyFilesPage() {
         <dd key={`details-${file.id}`}>
           Modified: {file.updated_at}
           <Download fileName={file.name} />
+          <button formAction={remove.bind(null, file.name)}>Remove</button>
         </dd>,
       );
     }
