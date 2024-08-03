@@ -22,14 +22,35 @@ export async function upload(formData: FormData) {
         redirect('/error');
     }
 
-    const { data: uploadData, error: uploadError } = await client.storage
+    const { error: uploadError } = await client.storage
         .from("uplouder-files").upload(`${userData.user.id}/${file.name}`, file);
 
     if (uploadError) {
         redirect('/error');
     } else {
-        const fileID = uploadData.id;
         revalidatePath("/my-files", "layout");
         redirect("/my-files");
     }
+}
+
+export async function download(fileName: string, prevState: any, formData: FormData) {
+    const client = createClient();
+    const { data: userData, error: userError } = await client.auth.getUser();
+    if (userError || !userData?.user) {
+      redirect('/login');
+    }
+
+
+    if (!fileName || !fileName.length) {
+        redirect('/error');
+    }
+
+    const { data: fileData, error: fileError } = await client.storage
+        .from("uplouder-files").download(`${userData.user.id}/${fileName}`);
+
+    if (fileError) {
+        redirect('/error');
+    }
+
+    return fileData.text();
 }

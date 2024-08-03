@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { upload } from './actions';
+import Download from './download';
+
 
 export default async function MyFilesPage() {
   const client = createClient();
@@ -16,7 +18,10 @@ export default async function MyFilesPage() {
     for (let file of filesData) {
       filesMarkups.push(
         <dt key={`file-${file.id}`}>{file.name}</dt>,
-        <dd key={`details-${file.id}`}>Modified: {file.updated_at}</dd>,
+        <dd key={`details-${file.id}`}>
+          Modified: {file.updated_at}
+          <Download fileName={file.name} />
+        </dd>,
       );
     }
   } else {
@@ -25,8 +30,9 @@ export default async function MyFilesPage() {
       <dd>Upload something first</dd>,
     );
   }
+
   
-  return (
+  return (<>
     <form>
       <fieldset>
         <legend>Upload file</legend>
@@ -36,11 +42,13 @@ export default async function MyFilesPage() {
         </label>
         <button formAction={upload}>Upload</button>
       </fieldset>
-
-      <label>
-        Your files:
-        <dl id="files">{filesMarkups}</dl>
-      </label>
     </form>
-  );
+
+    <form>
+      <fieldset>
+        <legend>Your files:</legend>
+        <dl id="files">{filesMarkups}</dl>
+      </fieldset>
+    </form>
+  </>);
 }
