@@ -54,3 +54,19 @@ export async function download(fileName: string, prevState: any, formData: FormD
 
     return fileData.text();
 }
+export async function remove(fileName: string, formData: FormData) {
+    const client = createClient();
+    const { data: userData, error: userError } = await client.auth.getUser();
+    if (userError || !userData?.user) {
+      redirect('/login');
+    }
+    const { data: removalData, error: removalError } = await client.storage
+        .from("uplouder-files").remove([`${userData.user.id}/${fileName}`]);
+
+    if (removalError) {
+        redirect('/error');
+    } else {
+        revalidatePath("/my-files", "layout");
+        redirect("/my-files");
+    }
+}
